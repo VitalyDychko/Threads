@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,10 @@ namespace _18._04._2022_Code
 {
     public partial class Form1 : Form
     {
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        private extern static void ReleaseCapture();
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        private extern static void SendMessage(System.IntPtr hWnd, int wMsg, int wParam, int lParam);
         //Представляет событие синхронизации потока, 
         //которое при получении сигнала необходимо сбросить вручную. Этот класс не наследуется.
         ManualResetEvent mre1 = new ManualResetEvent(false);
@@ -106,6 +111,27 @@ namespace _18._04._2022_Code
             if (myThread1 != null) myThread1.Abort();
             mre2.Reset();
             if (myThread2 != null) myThread2.Abort();
+        }
+
+        private void btnforMin_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void btnforMax_Click(object sender, EventArgs e)
+        {
+            this.WindowState = this.WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
+        }
+
+        private void btnforClose_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void panelTitleBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            ReleaseCapture();
+            SendMessage(this.Handle, 0x112, 0xf012, 0);
         }
     }
 }
